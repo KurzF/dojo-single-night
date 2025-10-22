@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use crate::cities;
+use crate::cities_map;
 
 fn short_route_from(from: &str, map: &HashMap<(&str, &str), u32>) -> Option<u32> {
     // Liste des villes a visiter
-    let mut to_visit = cities(&map);
+    let mut to_visit = cities_map(&map);
     to_visit.remove(from);
 
     // Aucune ville restante
@@ -28,7 +28,7 @@ fn short_route_from(from: &str, map: &HashMap<(&str, &str), u32>) -> Option<u32>
 }
 
 pub fn short_route(map: &HashMap<(&str, &str), u32>) -> Option<u32> {
-    let cities = cities(&map);
+    let cities = cities_map(&map);
     
     cities.iter().flat_map(|city| short_route_from(city, &map)).min()
 }

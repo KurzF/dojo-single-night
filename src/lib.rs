@@ -2,6 +2,7 @@ use std::{collections::{HashMap, HashSet}, u32};
 
 pub mod recursive;
 pub mod permutation;
+pub mod dfs;
 
 pub fn parse_map(input: &str) -> HashMap<(&str, &str), u32> {
     let mut map = HashMap::new();
@@ -40,8 +41,22 @@ pub fn parse_vec(input: &str) -> Vec<((&str, &str), u32)> {
 
 
 /// Extrait toutes les villes présentent dans la carte
-pub(crate) fn cities<'a>(map: &HashMap<(&'a str, &'a str), u32>) -> HashSet<&'a str> {
+pub(crate) fn cities_map<'a>(map: &HashMap<(&'a str, &'a str), u32>) -> HashSet<&'a str> {
     map.keys().map(|(from, _to)| *from).collect()
+}
+
+fn cities_vec<'a>(map: &'a Vec<((&'a str, &'a str), u32)>) -> Vec<&'a str> {
+    let mut to_visit = Vec::new();
+    for ((node1, node2), _) in  map.iter() {
+        if !to_visit.contains(node1) {
+            to_visit.push(node1);
+        }
+        if !to_visit.contains(node2) {
+            to_visit.push(node2);
+        }
+    }
+
+    to_visit
 }
 
 

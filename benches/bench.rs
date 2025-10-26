@@ -8,7 +8,7 @@ const INPUT: &str = include_str!("../input.txt");
 
 #[divan::bench]
 fn recursive(bencher: divan::Bencher) {
-    let map = parse_map(INPUT);
+    let map = parse_vec(INPUT);
 
     bencher.bench(|| {
         recursive::short_route(&map);

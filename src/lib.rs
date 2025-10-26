@@ -2,7 +2,7 @@ use std::{collections::{HashMap, HashSet}, u32};
 
 pub mod recursive;
 pub mod permutation;
-pub mod dfs;
+pub mod dp;
 
 pub fn parse_map(input: &str) -> HashMap<(&str, &str), u32> {
     let mut map = HashMap::new();
@@ -45,7 +45,7 @@ pub(crate) fn cities_map<'a>(map: &HashMap<(&'a str, &'a str), u32>) -> HashSet<
     map.keys().map(|(from, _to)| *from).collect()
 }
 
-fn cities_vec<'a>(map: &'a Vec<((&'a str, &'a str), u32)>) -> Vec<&'a str> {
+fn cities_vec<'a>(map: &'a [((&'a str, &'a str), u32)]) -> Vec<&'a str> {
     let mut to_visit = Vec::new();
     for ((node1, node2), _) in  map.iter() {
         if !to_visit.contains(node1) {
@@ -81,7 +81,7 @@ mod test{
         let input = "a to b = 10";
         let map = parse_map(input);
 
-        let result = cities(&map);
+        let result = cities_map(&map);
         let expected = ["a", "b"].iter().copied().collect();
         assert_eq!(result, expected);
     }

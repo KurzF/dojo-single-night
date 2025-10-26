@@ -1,49 +1,42 @@
-use std::collections::HashMap;
+use crate::{cities_vec};
 
-use crate::cities_map;
+pub fn short_route_from(from: &str, to_visit: &mut Vec<&str>, map: &[((&str, &str), u32)]) -> u32 {
 
-fn short_route_from(from: &str, map: &HashMap<(&str, &str), u32>) -> Option<u32> {
-    // Liste des villes a visiter
-    let mut to_visit = cities_map(&map);
-    to_visit.remove(from);
-
-    // Aucune ville restante
+    let index = to_visit.iter().position(|c| *c == from).unwrap();
+    to_visit.swap_remove(index);
+    
     if to_visit.is_empty() {
-        return Some(0);
+        return 0;
     }
 
-    // Carte sans la ville actuelle
-    let map_without_current: HashMap<(&str, &str), u32> = map.iter()
-        .filter(|((from_city, to_city), _)| *from_city != from && *to_city != from)
-        .map(|(key, dist)| (*key, *dist))
-        .collect();
-
     // La plus petite distance est la somme du chemin parcourue entre la première et la deuxième
-    // vile + la plus petite distance entre les autres ville
-    to_visit.iter().flat_map(|city| {
-        map.get(&(from, city))
-            .and_then(|d| short_route_from(city, &map_without_current)
-            .map(|sr| sr + d))
+    // vile + la plus petite distance entre les autres villes
+    to_visit.iter().map(|city| {
+        let dist = map.iter()
+            .find(|(edge, _)| *edge == (from, city) || *edge == (city, from))
+            .map(|(_, dist)| dist)
+            .unwrap();
+        dist + short_route_from(city, &mut to_visit.clone(), map)
     }).min()
+    .unwrap()
 }
 
-pub fn short_route(map: &HashMap<(&str, &str), u32>) -> Option<u32> {
-    let cities = cities_map(&map);
-    
-    cities.iter().flat_map(|city| short_route_from(city, &map)).min()
+pub fn short_route(map: &[((&str, &str), u32)]) -> u32 {
+    let to_visit = cities_vec(&map);
+    to_visit.iter().map(|city| short_route_from(city, &mut to_visit.clone(), &map)).min().unwrap()
 }
 
 #[cfg(test)]
 mod test {
-    use crate::{parse_map, recursive::short_route};
+    use crate::{parse_vec, recursive::short_route};
 
 
     #[test]
     fn test_route() {
         let input = include_str!("../input.txt");
-        let map = parse_map(input);
+        let map = parse_vec(input);
 
-        assert_eq!(Some(117), short_route(&map));
+        assert_eq!(117, short_route(&map));
     }
 
 }

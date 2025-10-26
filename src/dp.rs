@@ -56,11 +56,9 @@ where N: Eq + Copy
             None => {},
         }
 
-        let minimum = visited.iter()
-            .take(self.nodes.len())
-            .enumerate()
-            .filter(|(_, is_visited)| !is_visited)
-            .map(|(next, _)| {
+        let minimum = (0..self.nodes.len())
+            .filter(|i| !visited.is_visited(*i))
+            .map(|next| {
                 let dist = self.weights[from + next * self.nodes.len()];
                 dist + self.short_route_from(next, visited, memo)
             }).min().unwrap();
@@ -69,6 +67,7 @@ where N: Eq + Copy
 
         minimum
     }
+    
 
     fn short_route(&self) -> u32 {
         let mut memo = Vec::new();
@@ -91,43 +90,14 @@ impl Visited {
         self.0 |= 1 << i
     }
 
+    fn is_visited(&self, i: usize) -> bool {
+        self.0 & 1 << i != 0
+    }
+
     fn count(&self) -> u32 {
         self.0.count_ones()
     }
-
-    fn iter(&self) -> VisitedIter {
-        VisitedIter::new(*self)
-    }
 }
-
-pub struct VisitedIter {
-    shift: usize,
-    visited: Visited
-}
-
-impl VisitedIter {
-    fn new(visited: Visited) -> Self {
-        Self {
-            shift: 0,
-            visited
-        }
-    }
-}
-impl Iterator for VisitedIter {
-    type Item = bool;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.shift >= 32 {
-            return None;
-        }
-        
-        let item = Some(self.visited.0 & 1 << self.shift != 0);
-        self.shift += 1;
-
-        item
-    }
-}
-    
 
 pub fn short_route(map: &[((&str, &str), u32)]) -> u32 {
     let graph = CompleteGragh::new(map);

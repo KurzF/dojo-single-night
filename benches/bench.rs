@@ -1,4 +1,4 @@
-use dojo_11::{parse_map, parse_vec, permutation, recursive};
+use dojo_11::{dp, parse_vec, permutation, recursive};
 
 fn main() {
     divan::main()
@@ -21,5 +21,14 @@ fn permutation(bencher: divan::Bencher) {
 
     bencher.bench(|| {
         permutation::short_route(&map);
+    });
+}
+
+#[divan::bench]
+fn dp(bencher: divan::Bencher) {
+    let map = parse_vec(INPUT);
+
+    bencher.bench(|| {
+        dp::short_route(&map);
     });
 }
